@@ -1,12 +1,17 @@
-const service = require('./theaters.service');
-const asyncErrorBoundary = require('../errors/asyncErrorBoundary');
+const service = require("./theaters.service");
+const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
-// CRUDL
+
 async function list(req, res) {
-    const data = await service.list();
-    res.json({ data });
+    const theaters = await service.list();
+    for(let theater of theaters){
+        const movieList = await service.addMovies(theater.theater_id);
+        theater["movies"] = movieList;
+    }
+    console.log(theaters);
+    res.json({ data: theaters })
 }
 
 module.exports = {
-    list: asyncErrorBoundary(list)
+  list: [asyncErrorBoundary(list)],
 }
